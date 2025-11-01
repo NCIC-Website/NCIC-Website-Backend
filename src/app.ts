@@ -5,6 +5,8 @@ import dev from "../config/default";
 
 import testRouter from "./routes/test/test.router";
 import { createInitialAdmin } from "./modules/createSystemAdmin";
+import authRoutes from "./routes/auth/auth.router";
+import adminRouter from "./routes/admin/admin.router";
 
 const app: Express = express();
 
@@ -24,5 +26,7 @@ app.use(bodyParser.json()); //To enable the submitting of json to this applicati
 app.use(bodyParser.urlencoded({ extended: true })); //To enable the submitting of urlencoded data like the get request
 
 app.use("/test", testRouter);
+app.use("/auth", authRoutes);
+app.use("/admin", adminRouter);
 
 export default app
