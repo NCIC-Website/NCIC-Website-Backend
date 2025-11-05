@@ -3,7 +3,8 @@ import express from "express";
 import { 
     addContentManger, 
     getAllContentManagers,
-    addDevotional
+    addDevotional,
+    addMultipleDevotionals
 } from "./admin.controller";
 
 const adminRouter = express.Router();
@@ -12,4 +13,6 @@ const adminRouter = express.Router();
 adminRouter.post('/addContentManager', addContentManger );
 adminRouter.get('/getAllContentManagers', getAllContentManagers );
 adminRouter.post('/addDevotional', addDevotional );
+adminRouter.post('/addMultipleDevotionals', addMultipleDevotionals );
+
 export default adminRouter;
