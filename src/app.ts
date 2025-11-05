@@ -2,6 +2,7 @@ import express, { Express }from "express";
 import mongoose, { ConnectOptions } from "mongoose";
 import bodyParser from "body-parser";
 import dev from "../config/default";
+import { startDailyDevotionalPublish } from "./modules/dailyDevotional";
 
 import testRouter from "./routes/test/test.router";
 import { createInitialAdmin } from "./modules/createSystemAdmin";
@@ -21,6 +22,8 @@ mongoose
     console.log("Error while connecting to db " + err);
 });
 
+// Start the daily devotional publishing scheduler
+startDailyDevotionalPublish();
 
 app.use(bodyParser.json()); //To enable the submitting of json to this application
 app.use(bodyParser.urlencoded({ extended: true })); //To enable the submitting of urlencoded data like the get request
