@@ -56,6 +56,51 @@ export async function getAllContentManagers(req: Request, res: Response) {
     }
 }
 
+export async function updateManagerStatus(req: Request, res: Response) {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    if (!["active", "deactivated"].includes(status)) {
+      return res.status(400).json({
+        success: false,
+        message: "Status must be either 'active' or 'deactivated'."
+      });
+    }
+
+    const manager = await Admin.findById(id);
+
+    if (!manager) {
+      return res.status(404).json({
+        success: false,
+        message: "Content manager not found."
+      });
+    }
+
+    if (manager.role !== "contentManager") {
+      return res.status(403).json({
+        success: false,
+        message: "This user is not a content manager and cannot be updated."
+      });
+    }
+
+    manager.status = status;
+    await manager.save();
+
+    return res.status(200).json({
+      success: true,
+      message: `Content manager has been ${status === "active" ? "activated" : "deactivated"}.`,
+      data: manager
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Failed to update manager status.",
+      error: error instanceof Error ? error.message : error
+    });
+  }
+}
+
 export async function addDevotional(req: Request, res: Response) {
   try {
     const {

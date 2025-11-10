@@ -7,6 +7,7 @@ export interface IAdmin extends Document {
   email: string;
   password: string;
   role: 'superAdmin' | 'contentManager';
+  status: 'active' | 'inactive';
   created_date: Date;
   last_login: Date;
   
@@ -22,6 +23,11 @@ const adminSchema = new Schema<IAdmin>({
     type: String,
     enum: ['superAdmin', 'contentManager'],
     default: 'contentManager'
+  },
+  status: {
+    type: String,
+    enum: ['active', 'inactive'],
+    default: 'active'
   },
   created_date: { type: Date, default: Date.now },
   last_login: { type: Date }
