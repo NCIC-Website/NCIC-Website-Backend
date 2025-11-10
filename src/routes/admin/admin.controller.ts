@@ -61,37 +61,48 @@ export async function addDevotional(req: Request, res: Response) {
     const {
       title_am,
       title_en,
-      devotional_note_am,
-      devotional_note_en,
       verse_reference_am,
       verse_reference_en,
       verse_text_am,
       verse_text_en,
+      devotional_note_am,
+      devotional_note_en,
+      confession_am,
+      confession_en,
       author,
       tags
     } = req.body;
 
     // Validate required fields
-    if (!title_am || !devotional_note_am || !verse_reference_am || !verse_text_am) {
+    if (
+      !title_am ||
+      !verse_reference_am ||
+      !verse_text_am ||
+      !devotional_note_am ||
+      !confession_am
+    ) {
       return res.status(400).json({
         success: false,
-        message: "title_am, devotional_note_am, verse_reference_am, and verse_text_am are required.",
+        message:
+          "title_am, verse_reference_am, verse_text_am, devotional_note_am, and confession_am are required.",
       });
     }
 
     const newDevotional = new Devotional({
       title_am,
       title_en,
-      devotional_note_am,
-      devotional_note_en,
       verse_reference_am,
       verse_reference_en,
       verse_text_am,
       verse_text_en,
+      devotional_note_am,
+      devotional_note_en,
+      confession_am,
+      confession_en,
       author,
       tags,
-      is_published: false,  // Always false on creation
-      publish_date: null    // Only set when published
+      is_published: false,
+      publish_date: null
     });
 
     const savedDevotional = await newDevotional.save();
@@ -111,6 +122,7 @@ export async function addDevotional(req: Request, res: Response) {
   }
 }
 
+
 export async function addMultipleDevotionals(req: Request, res: Response) {
   try {
     const devotionals = req.body;
@@ -122,27 +134,31 @@ export async function addMultipleDevotionals(req: Request, res: Response) {
       });
     }
 
-    // Validate each devotional
-    const invalidItems = devotionals.filter(d => 
-      !d.title_am || !d.devotional_note_am || !d.verse_reference_am || !d.verse_text_am
+    // Validate each devotional item
+    const invalidItems = devotionals.filter(d =>
+      !d.title_am ||
+      !d.verse_reference_am ||
+      !d.verse_text_am ||
+      !d.devotional_note_am ||
+      !d.confession_am
     );
 
     if (invalidItems.length > 0) {
       return res.status(400).json({
         success: false,
-        message: "Each devotional must include title_am, devotional_note_am, verse_reference_am, and verse_text_am.",
+        message:
+          "Each devotional must include title_am, verse_reference_am, verse_text_am, devotional_note_am, and confession_am.",
         invalidCount: invalidItems.length
       });
     }
 
-    // Map devotionals to add default fields
-    const devotionalsToInsert = devotionals.map(d => ({
+    const formatted = devotionals.map(d => ({
       ...d,
       is_published: false,
       publish_date: null
     }));
 
-    const insertedDevotionals = await Devotional.insertMany(devotionalsToInsert);
+    const insertedDevotionals = await Devotional.insertMany(formatted);
 
     return res.status(201).json({
       success: true,
