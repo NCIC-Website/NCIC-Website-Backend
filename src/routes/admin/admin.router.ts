@@ -1,18 +1,10 @@
 import express from "express";
-
-import { 
-    addContentManger, 
-    getAllContentManagers,
-    addDevotional,
-    addMultipleDevotionals
-} from "./admin.controller";
+import { addDevotional, addMultipleDevotionals } from "./admin.controller";
 
 const adminRouter = express.Router();
 
-// Admin Login Route
-adminRouter.post('/addContentManager', addContentManger );
-adminRouter.get('/getAllContentManagers', getAllContentManagers );
-adminRouter.post('/addDevotional', addDevotional );
-adminRouter.post('/addMultipleDevotionals', addMultipleDevotionals );
+// Backward-compatible devotional routes (also available at /devotional/add)
+adminRouter.post("/addDevotional", addDevotional);
+adminRouter.post("/addMultipleDevotionals", addMultipleDevotionals);
 
 export default adminRouter;

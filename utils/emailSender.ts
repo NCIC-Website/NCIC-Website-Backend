@@ -1,24 +1,31 @@
 import nodemailer from 'nodemailer';
 
-export async function sendAccountCreationEmail(userEmail: string, password: string, message:string): Promise<void> {
-  // Create a transporter object using SMTP transport with Gmail
-  const transporter = nodemailer.createTransport({
+function createTransporter() {
+  return nodemailer.createTransport({
     service: 'gmail',
     auth: {
-      user: process.env.SMTP_USER, // Your Gmail email address
-      pass: process.env.SMTP_PASS, // Your Gmail account password or app-specific password
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
     },
   });
+}
 
-  // Email content
-  const mailOptions = {
-    from: '"NCIC Website" <no-reply@NCIC.com>', // Sender address
-    to: userEmail, // List of recipients
-    subject: 'Account Creation', // Subject line
-    text: `${message} Your password is: ${password}`, // Plain text body
-    html: `<p>${message}</p><p>Your password is: <strong>${password}</strong> <br> Please make sure <strong> to change your password </strong> <br> You are blessed!</p>`, // HTML body
-  };
+export async function sendAccountCreationEmail(userEmail: string, password: string, message: string): Promise<void> {
+  const transporter = createTransporter();
+  await transporter.sendMail({
+    from: '"NCIC Website" <no-reply@ncic.com>',
+    to: userEmail,
+    subject: 'Your NCIC Admin Account',
+    html: `<p>${message}</p><p>Your temporary password is: <strong>${password}</strong></p><p>Please <strong>change your password</strong> after logging in.</p><p>You are blessed!</p>`,
+  });
+}
 
-  // Send the email
-  await transporter.sendMail(mailOptions);
+export async function sendOtpEmail(userEmail: string, otp: string, name: string): Promise<void> {
+  const transporter = createTransporter();
+  await transporter.sendMail({
+    from: '"NCIC Website" <no-reply@ncic.com>',
+    to: userEmail,
+    subject: 'Password Reset OTP',
+    html: `<p>Hello ${name},</p><p>Your password reset OTP is: <strong style="font-size:24px;letter-spacing:4px">${otp}</strong></p><p>This OTP expires in <strong>15 minutes</strong>.</p><p>If you did not request this, please ignore this email.</p>`,
+  });
 }

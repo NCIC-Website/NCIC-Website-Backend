@@ -1,5 +1,4 @@
 import dotenv from 'dotenv';
-
 dotenv.config();
 
 const dev = {
@@ -13,6 +12,10 @@ const dev = {
     host: process.env.MONGO_DB_HOST || 'localhost',
     dbName: process.env.DB_NAME,
     dbUrl: process.env.DB_URL || 'mongodb://localhost/NCIC',
+  },
+  jwt: {
+    secret: process.env.JWT_SECRET || 'ncic_jwt_secret_change_in_production',
+    expiresIn: '24h',
   },
 };
 
