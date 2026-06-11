@@ -1,11 +1,15 @@
 import express from "express";
 import { sendMessage, getAllMessages, markAsRead, deleteMessage } from "./contact.controller";
+import { authenticate } from "../../middleware/auth.middleware";
 
 const contactRouter = express.Router();
 
+// ── Public ──
 contactRouter.post("/send", sendMessage);
-contactRouter.get("/messages", getAllMessages);
-contactRouter.patch("/messages/:id/read", markAsRead);
-contactRouter.delete("/messages/:id", deleteMessage);
+
+// ── Admin (auth required) ──
+contactRouter.get("/messages", authenticate, getAllMessages);
+contactRouter.patch("/messages/:id/read", authenticate, markAsRead);
+contactRouter.delete("/messages/:id", authenticate, deleteMessage);
 
 export default contactRouter;

@@ -1,10 +1,14 @@
 import express from "express";
 import { subscribe, getAllSubscribers, unsubscribe } from "./newsletter.controller";
+import { authenticate } from "../../middleware/auth.middleware";
 
 const newsletterRouter = express.Router();
 
+// ── Public ──
 newsletterRouter.post("/subscribe", subscribe);
-newsletterRouter.get("/subscribers", getAllSubscribers);
-newsletterRouter.post("/unsubscribe", unsubscribe);
+
+// ── Admin (auth required) ──
+newsletterRouter.get("/subscribers", authenticate, getAllSubscribers);
+newsletterRouter.post("/unsubscribe", authenticate, unsubscribe);
 
 export default newsletterRouter;

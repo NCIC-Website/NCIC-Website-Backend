@@ -20,7 +20,11 @@ const app: Express = express();
 
 // CORS middleware — must be before all other middleware and routes
 app.use((req: Request, res: Response, next: NextFunction) => {
-  const allowedOrigins = ["http://localhost:5173", "http://localhost:8080"];
+  const allowedOrigins = [
+    "http://localhost:5173",
+    "http://localhost:8080",
+    process.env.FRONTEND_URL,        // your Vercel URL e.g. https://your-app.vercel.app
+  ].filter(Boolean) as string[];
   const origin = req.headers.origin;
   if (origin && allowedOrigins.includes(origin)) {
     res.setHeader("Access-Control-Allow-Origin", origin);
@@ -47,33 +51,20 @@ mongoose
 // Start the daily devotional publishing scheduler
 startDailyDevotionalPublish();
 
-import { authenticate, requireRole } from "./middleware/auth.middleware";
-
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use("/test", testRouter);
 app.use("/auth", authRoutes);
 
-// Public endpoints (no auth needed — used by the public website)
-app.use("/devotional/today", devotionalRouter);
-app.use("/teaching/public", teachingRouter);
-app.use("/teaching-series/public", teachingSeriesRouter);
-app.use("/testimony/video/public", testimonyRouter);
-app.use("/testimony/written/public", testimonyRouter);
-app.use("/testimony/written/submit", testimonyRouter);
-app.use("/newsletter/subscribe", newsletterRouter);
-app.use("/contact/send", contactRouter);
-app.use("/bible-college/apply", bibleCollegeRouter);
-
-// Protected admin routes
-app.use("/admin", authenticate, adminRouter);
-app.use("/devotional", authenticate, devotionalRouter);
-app.use("/teaching", authenticate, teachingRouter);
-app.use("/teaching-series", authenticate, teachingSeriesRouter);
-app.use("/testimony", authenticate, testimonyRouter);
-app.use("/newsletter", authenticate, newsletterRouter);
-app.use("/contact", authenticate, contactRouter);
-app.use("/bible-college", authenticate, bibleCollegeRouter);
+// All routers mounted without global auth — each router handles its own auth internally
+app.use("/devotional", devotionalRouter);
+app.use("/teaching", teachingRouter);
+app.use("/teaching-series", teachingSeriesRouter);
+app.use("/testimony", testimonyRouter);
+app.use("/newsletter", newsletterRouter);
+app.use("/contact", contactRouter);
+app.use("/bible-college", bibleCollegeRouter);
+app.use("/admin", adminRouter);
 
 export default app

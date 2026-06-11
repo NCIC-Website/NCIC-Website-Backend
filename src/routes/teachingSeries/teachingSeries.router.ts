@@ -1,21 +1,17 @@
 import express from "express";
-import {
-  addSeries,
-  getAllSeries,
-  getPublishedSeries,
-  updateSeries,
-  toggleSeriesPublish,
-  deleteSeries,
-} from "./teachingSeries.controller";
+import { addSeries, getAllSeries, getPublishedSeries, updateSeries, toggleSeriesPublish, deleteSeries } from "./teachingSeries.controller";
+import { authenticate } from "../../middleware/auth.middleware";
 
 const teachingSeriesRouter = express.Router();
 
-// Static before parameterized
+// ── Public ──
 teachingSeriesRouter.get("/public", getPublishedSeries);
-teachingSeriesRouter.get("/", getAllSeries);
-teachingSeriesRouter.post("/add", addSeries);
-teachingSeriesRouter.put("/:id/publish", toggleSeriesPublish);
-teachingSeriesRouter.put("/:id", updateSeries);
-teachingSeriesRouter.delete("/:id", deleteSeries);
+
+// ── Admin (auth required) ──
+teachingSeriesRouter.get("/", authenticate, getAllSeries);
+teachingSeriesRouter.post("/add", authenticate, addSeries);
+teachingSeriesRouter.put("/:id/publish", authenticate, toggleSeriesPublish);
+teachingSeriesRouter.put("/:id", authenticate, updateSeries);
+teachingSeriesRouter.delete("/:id", authenticate, deleteSeries);
 
 export default teachingSeriesRouter;
