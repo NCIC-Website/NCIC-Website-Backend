@@ -12,7 +12,7 @@ export interface IVideoTestimony extends Document {
 
 // Accepts full YouTube URLs and bare 11-char video IDs
 const youtubeUrlRegex =
-  /^(https?:\/\/)?(www\.)?(youtube\.com\/(watch\?v=|embed\/)|youtu\.be\/)[\w-]{11}$|^[\w-]{11}$/;
+  /^(https?:\/\/)?(www\.)?(youtube\.com\/(watch\?.*v=|embed\/|shorts\/)|youtu\.be\/)[\w-]{11}.*$|^[\w-]{11}$/;
 
 const videoTestimonySchema = new Schema<IVideoTestimony>(
   {
