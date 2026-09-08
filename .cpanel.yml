@@ -8,6 +8,9 @@ deployment:
     # Copy files to deployment directory (exclude node_modules and .git)
     - rsync -av --exclude='node_modules' --exclude='.git' --exclude='*.log' . $DEPLOYPATH/
     - cd $DEPLOYPATH
+    # Use Node.js 18 (check available versions with: ls /opt/alt/)
+    - export PATH=/opt/alt/alt-nodejs18/root/usr/bin:$PATH
+    - node --version
     # Install Node.js dependencies for production
     - npm install --production
     # Install TypeScript and ts-node globally if not available
