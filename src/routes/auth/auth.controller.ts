@@ -16,26 +16,50 @@ export async function adminLogin(req: Request, res: Response) {
     if (!email || !password) {
       return res.status(400).json({ success: false, message: 'Email and password are required.' });
     }
+
     const admin = await Admin.findOne({ email });
     if (!admin) return res.status(401).json({ success: false, message: 'Invalid credentials.' });
     if (admin.status === 'inactive') return res.status(403).json({ success: false, message: 'Account is inactive.' });
 
     const valid = await bcrypt.compare(password, admin.password);
-    if (!valid) return res.status(401).json({ success: false, message: 'Invalid credentials.' });
+    if (!valid) {
+      console.log(`Failed login attempt for ${email} from IP: ${req.ip}`);
+      return res.status(401).json({ success: false, message: 'Invalid credentials.' });
+    }
 
+    // Update login tracking
     admin.last_login = new Date();
     await admin.save();
 
-    const token = jwt.sign({ id: admin._id, role: admin.role }, dev.jwt.secret, { expiresIn: dev.jwt.expiresIn as any });
+    const token = jwt.sign({ id: admin._id, role: admin.role }, dev.jwt.secret, { 
+      expiresIn: dev.jwt.expiresIn as any 
+    });
+
+    // Log successful login
+    console.log(JSON.stringify({
+      timestamp: new Date().toISOString(),
+      action: 'ADMIN_LOGIN_SUCCESS',
+      userId: admin._id,
+      email: admin.email,
+      role: admin.role,
+      ip: req.ip
+    }));
 
     return res.status(200).json({
       success: true,
       message: 'Login successful.',
       token,
-      user: { id: admin._id, first_name: admin.first_name, email: admin.email, role: admin.role },
+      user: { 
+        id: admin._id, 
+        first_name: admin.first_name, 
+        email: admin.email, 
+        role: admin.role,
+        last_login: admin.last_login
+      },
     });
   } catch (e) {
-    return res.status(500).json({ success: false, message: 'Login failed.', error: err(e) });
+    console.error('Login error:', err(e));
+    return res.status(500).json({ success: false, message: 'Login failed.' });
   }
 }
 

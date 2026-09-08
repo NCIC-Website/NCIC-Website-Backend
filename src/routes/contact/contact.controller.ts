@@ -6,14 +6,50 @@ function err(e: unknown) { return e instanceof Error ? e.message : String(e); }
 export async function sendMessage(req: Request, res: Response) {
   try {
     const { full_name, email, message } = req.body;
-    if (!full_name || !email || !message) {
-      return res.status(400).json({ success: false, message: "full_name, email, and message are required." });
+    
+    // Basic validation
+    if (!full_name?.trim() || !email?.trim() || !message?.trim()) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "All fields are required and cannot be empty." 
+      });
     }
-    const msg = new ContactMessage({ full_name, email, message });
+
+    // Email format check
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email.trim())) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Please provide a valid email address." 
+      });
+    }
+
+    // Message length check
+    if (message.length > 1000) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Message is too long. Please limit to 1000 characters." 
+      });
+    }
+
+    const msg = new ContactMessage({ 
+      full_name: full_name.trim(), 
+      email: email.toLowerCase().trim(), 
+      message: message.trim() 
+    });
+    
     await msg.save();
-    return res.status(201).json({ success: true, message: "Message sent successfully." });
+
+    return res.status(201).json({ 
+      success: true, 
+      message: "Thank you for your message! We'll get back to you soon." 
+    });
   } catch (e) {
-    return res.status(500).json({ success: false, message: "Failed to send message.", error: err(e) });
+    console.error('Contact form error:', err(e));
+    return res.status(500).json({ 
+      success: false, 
+      message: "Failed to send message. Please try again later." 
+    });
   }
 }
 

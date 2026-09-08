@@ -3,7 +3,7 @@ import {
   addVideoTestimony, getAllVideoTestimonies, getPublishedVideoTestimonies,
   toggleVideoPublish, setVideoFeatured, deleteVideoTestimony,
   submitWrittenTestimony, getAllWrittenTestimonies, getPublishedWrittenTestimonies,
-  approveWrittenTestimony, toggleWrittenPublish, deleteWrittenTestimony,
+  approveWrittenTestimony, toggleWrittenPublish, deleteWrittenTestimony
 } from "./testimony.controller";
 import { authenticate } from "../../middleware/auth.middleware";
 

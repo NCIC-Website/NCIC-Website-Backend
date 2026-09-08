@@ -12,7 +12,8 @@ function isCastError(error: unknown): boolean {
   return error instanceof mongoose.Error.CastError;
 }
 
-// ─── Video Testimony Controllers ───────────────────────────────────────────
+export const videoTestimonyValidation = [];
+export const writtenTestimonyValidation = [];
 
 export async function addVideoTestimony(req: Request, res: Response) {
   try {
@@ -84,7 +85,6 @@ export async function setVideoFeatured(req: Request, res: Response) {
       return res.status(400).json({ success: false, message: "is_featured must be a boolean." });
     }
 
-    // When setting featured=true, unset any existing featured testimony first
     if (is_featured) {
       await VideoTestimony.updateMany({ is_featured: true }, { $set: { is_featured: false } });
     }
@@ -120,8 +120,6 @@ export async function deleteVideoTestimony(req: Request, res: Response) {
     return res.status(500).json({ success: false, message: "Failed to delete video testimony.", error: getErrorMessage(error) });
   }
 }
-
-// ─── Written Testimony Controllers ─────────────────────────────────────────
 
 export async function submitWrittenTestimony(req: Request, res: Response) {
   try {
@@ -178,7 +176,6 @@ export async function approveWrittenTestimony(req: Request, res: Response) {
       return res.status(400).json({ success: false, message: "is_approved must be a boolean." });
     }
 
-    // If unapproving, also unpublish
     const updateFields: Record<string, boolean> = { is_approved };
     if (!is_approved) {
       updateFields.is_published = false;
@@ -208,7 +205,6 @@ export async function toggleWrittenPublish(req: Request, res: Response) {
       return res.status(400).json({ success: false, message: "is_published must be a boolean." });
     }
 
-    // Only allow publishing if approved
     if (is_published) {
       const testimony = await WrittenTestimony.findById(req.params.id);
       if (!testimony) {

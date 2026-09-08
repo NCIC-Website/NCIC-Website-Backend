@@ -1,0 +1,26 @@
+---
+deployment:
+  tasks:
+    # Set deployment path
+    - export DEPLOYPATH=/home/newcreb/ncic-backend
+    # Create deployment directory if it doesn't exist
+    - mkdir -p $DEPLOYPATH
+    # Copy files to deployment directory (exclude node_modules and .git)
+    - rsync -av --exclude='node_modules' --exclude='.git' --exclude='*.log' . $DEPLOYPATH/
+    - cd $DEPLOYPATH
+    # Install Node.js dependencies for production
+    - npm install --production
+    # Install TypeScript and ts-node globally if not available
+    - npm install -g typescript ts-node || true
+    # Install PM2 if not already installed
+    - npm install -g pm2 || true
+    # Stop existing process if running
+    - pm2 stop ncic-backend || true
+    # Delete old process if exists
+    - pm2 delete ncic-backend || true
+    # Start the backend application with proper TypeScript support
+    - pm2 start src/index.ts --name ncic-backend --interpreter ts-node
+    # Save PM2 configuration
+    - pm2 save
+    # Setup auto-restart on server reboot
+    - pm2 startup || true

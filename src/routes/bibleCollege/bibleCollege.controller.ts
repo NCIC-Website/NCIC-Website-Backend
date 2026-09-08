@@ -6,15 +6,50 @@ function err(e: unknown) { return e instanceof Error ? e.message : String(e); }
 export async function submitApplication(req: Request, res: Response) {
   try {
     const required = ["full_name", "email", "phone", "date_of_birth", "gender", "education_level", "program_interest", "learning_mode", "address"];
-    const missing = required.filter(f => !req.body[f]);
+    const missing = required.filter(f => !req.body[f]?.trim?.() || !req.body[f]);
+    
     if (missing.length > 0) {
-      return res.status(400).json({ success: false, message: `Missing required fields: ${missing.join(", ")}.` });
+      return res.status(400).json({ 
+        success: false, 
+        message: `Please complete all required fields: ${missing.join(", ")}.` 
+      });
     }
+
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(req.body.email.trim())) {
+      return res.status(400).json({
+        success: false,
+        message: "Please provide a valid email address."
+      });
+    }
+
+    // Check for duplicate applications
+    const existingApp = await BibleCollegeApplication.findOne({ 
+      email: req.body.email.toLowerCase().trim() 
+    });
+
+    if (existingApp) {
+      return res.status(409).json({
+        success: false,
+        message: "An application with this email already exists. Please contact us if you need to update your application."
+      });
+    }
+
     const app = new BibleCollegeApplication(req.body);
     await app.save();
-    return res.status(201).json({ success: true, message: "Application submitted successfully." });
+    
+    return res.status(201).json({ 
+      success: true, 
+      message: "Thank you for your application! We will review it and contact you within 5-7 business days.",
+      application_id: app._id
+    });
   } catch (e) {
-    return res.status(500).json({ success: false, message: "Failed to submit application.", error: err(e) });
+    console.error('Bible College application error:', err(e));
+    return res.status(500).json({ 
+      success: false, 
+      message: "Failed to submit application. Please try again later." 
+    });
   }
 }
 

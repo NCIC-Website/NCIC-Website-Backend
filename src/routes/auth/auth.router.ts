@@ -7,7 +7,7 @@ import { authenticate, requireRole } from "../../middleware/auth.middleware";
 
 const router = express.Router();
 
-// Public
+// Public (with basic rate limiting applied in app.ts)
 router.post("/admin-login", adminLogin);
 router.post("/forgot-password", forgotPassword);
 router.post("/reset-password", resetPassword);
@@ -16,7 +16,7 @@ router.post("/reset-password", resetPassword);
 router.get("/me", authenticate, getMe);
 router.post("/change-password", authenticate, changePassword);
 
-// SuperAdmin only
+// SuperAdmin only 
 router.post("/users", authenticate, requireRole("superAdmin"), createUser);
 router.get("/users", authenticate, requireRole("superAdmin"), getAllUsers);
 router.patch("/users/:id/status", authenticate, requireRole("superAdmin"), updateUserStatus);
