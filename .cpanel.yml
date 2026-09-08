@@ -8,22 +8,23 @@ deployment:
     # Copy files to deployment directory (exclude node_modules and .git)
     - rsync -av --exclude='node_modules' --exclude='.git' --exclude='*.log' . $DEPLOYPATH/
     - cd $DEPLOYPATH
-    # Use Node.js 18 (check available versions with: ls /opt/alt/)
-    - export PATH=/opt/alt/alt-nodejs18/root/usr/bin:$PATH
+    # Try multiple Node.js versions in order of preference
+    - export PATH=/opt/alt/alt-nodejs20/root/usr/bin:$PATH || export PATH=/opt/alt/alt-nodejs18/root/usr/bin:$PATH || export PATH=/opt/alt/alt-nodejs16/root/usr/bin:$PATH || true
     - node --version
-    # Install Node.js dependencies for production
-    - npm install --production
-    # Install TypeScript and ts-node globally if not available
-    - npm install -g typescript ts-node || true
-    # Install PM2 if not already installed
-    - npm install -g pm2 || true
+    - npm --version
+    # Install dependencies with legacy peer deps for compatibility
+    - npm install --production --legacy-peer-deps
+    # Install global dependencies with correct Node path
+    - /opt/alt/alt-nodejs18/root/usr/bin/npm install -g typescript ts-node pm2 || npm install -g typescript ts-node pm2 || true
     # Stop existing process if running
     - pm2 stop ncic-backend || true
     # Delete old process if exists
     - pm2 delete ncic-backend || true
-    # Start the backend application with proper TypeScript support
-    - pm2 start src/index.ts --name ncic-backend --interpreter ts-node
+    # Compile TypeScript to JavaScript for compatibility
+    - npx tsc --outDir dist --target es2018 src/index.ts || true
+    # Start with ts-node if available, otherwise try node directly
+    - pm2 start src/index.ts --name ncic-backend --interpreter ts-node || pm2 start dist/index.js --name ncic-backend || node src/index.ts &
     # Save PM2 configuration
-    - pm2 save
+    - pm2 save || true
     # Setup auto-restart on server reboot
     - pm2 startup || true

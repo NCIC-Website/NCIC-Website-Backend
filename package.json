@@ -26,6 +26,11 @@
     "typescript": "^5.7.3"
   },
   "scripts": {
-    "start": "nodemon src/index.ts"
+    "start": "node src/index.js",
+    "start:ts": "ts-node src/index.ts",
+    "start:nodemon": "nodemon src/index.ts",
+    "dev": "nodemon src/index.ts",
+    "build": "tsc --outDir dist --target es2018",
+    "prod": "npm run build && node dist/index.js"
   }
 }
