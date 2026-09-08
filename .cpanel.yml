@@ -15,15 +15,13 @@ deployment:
     # Install dependencies with legacy peer deps for compatibility
     - npm install --production --legacy-peer-deps
     # Install global dependencies with correct Node path
-    - /opt/alt/alt-nodejs18/root/usr/bin/npm install -g typescript ts-node pm2 || npm install -g typescript ts-node pm2 || true
+    - npm install -g typescript ts-node pm2 || true
     # Stop existing process if running
     - pm2 stop ncic-backend || true
     # Delete old process if exists
     - pm2 delete ncic-backend || true
-    # Compile TypeScript to JavaScript for compatibility
-    - npx tsc --outDir dist --target es2018 src/index.ts || true
-    # Start with ts-node if available, otherwise try node directly
-    - pm2 start src/index.ts --name ncic-backend --interpreter ts-node || pm2 start dist/index.js --name ncic-backend || node src/index.ts &
+    # Start with TypeScript directly using ts-node
+    - pm2 start src/index.ts --name ncic-backend --interpreter ts-node
     # Save PM2 configuration
     - pm2 save || true
     # Setup auto-restart on server reboot

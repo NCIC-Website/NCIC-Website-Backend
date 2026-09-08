@@ -102,9 +102,10 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 app.set('trust proxy', 1);
 
 mongoose
-  .connect(dev.db.dbUrl, { useNewUrlParser: true } as ConnectOptions)
+  .connect(dev.db.dbUrl)
   .then(async (res) => {
     console.log("Connected to db");
+    console.log("Database name:", res.connection.db?.databaseName);
     await createInitialAdmin();
   })
   .catch((err) => {
