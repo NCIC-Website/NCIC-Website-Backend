@@ -1,11 +1,8 @@
 ---
 deployment:
   tasks:
-    # Set deployment path
     - export DEPLOYPATH=/home/newcreb/ncic-backend
-    # Create deployment directory if it doesn't exist
     - mkdir -p $DEPLOYPATH
-    # Copy application files (exclude node_modules and .git)
     - /bin/cp -R src $DEPLOYPATH/
     - /bin/cp -R config $DEPLOYPATH/
     - /bin/cp -R utils $DEPLOYPATH/
