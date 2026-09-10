@@ -2,9 +2,9 @@ import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { Admin } from '../../modules/admin';
-import dev from '../../../config/default';
-import { generatePassword } from '../../../utils/passwordGenerator';
-import { sendAccountCreationEmail, sendOtpEmail } from '../../../utils/emailSender';
+import dev from '../../config/default';
+import { generatePassword } from '../../utils/passwordGenerator';
+import { sendAccountCreationEmail, sendOtpEmail } from '../../utils/emailSender';
 import { AuthRequest } from '../../middleware/auth.middleware';
 
 function err(e: unknown) { return e instanceof Error ? e.message : String(e); }

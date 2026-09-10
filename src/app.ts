@@ -4,7 +4,7 @@ import bodyParser from "body-parser";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import mongoSanitize from "express-mongo-sanitize";
-import dev from "../config/default";
+import dev from "./config/default";
 import { startDailyDevotionalPublish } from "./modules/dailyDevotional";
 
 import testRouter from "./routes/test/test.router";
